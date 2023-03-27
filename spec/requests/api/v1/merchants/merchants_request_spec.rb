@@ -9,15 +9,15 @@ RSpec.describe "Merchant API" do
 
       expect(response).to be_successful 
 
-      merchants = JSON.parse(response.body, symbolize_names: true)
+      merchants = JSON.parse(response.body, symbolize_names: true)[:data]
 
-      expect(merchants).to have_key(:data)
+      expect(merchants).to be_an(Array)
 
-      expect(merchants[:data].count).to eq(3)
+      expect(merchants.count).to eq(3)
 
-      merchants[:data].each do |merchant| 
+      merchants.each do |merchant| 
         expect(merchant).to have_key(:id)
-        expect(merchant[:id]).to be_an(Integer) 
+        expect(merchant[:id].to_i).to be_an(Integer) 
 
         expect(merchant).to have_key(:type)
         expect(merchant[:type]).to eq("merchant")
@@ -35,7 +35,7 @@ RSpec.describe "Merchant API" do
       get "/api/v1/merchants/#{id}"
 
       merchant = JSON.parse(response.body, symbolize_names: true)
-
+      
       expect(response).to be_successful
 
       expect(merchant).to have_key(:data)
@@ -50,8 +50,6 @@ RSpec.describe "Merchant API" do
     end
 
     it "sad path - is not succuessful with an incorrect id" do 
-      # merchant = merchant_with_items
-      # item_id = merchant.items.first.id
       create_list(:merchant, 3)
     
       expect {get "/api/v1/merchants/9999"}.to raise_error(ActiveRecord::RecordNotFound)
