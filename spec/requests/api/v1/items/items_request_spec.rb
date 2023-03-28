@@ -58,4 +58,38 @@ RSpec.describe "Items Request Spec" do
       expect {get "/api/v1/items/not_even_a_number"}.to raise_error(ActiveRecord::RecordNotFound)
     end
   end
+
+  describe "create an item" do 
+    it "can create a new item" do 
+      create(:merchant, id: 14)
+      item_params = ({
+                      name: "Very Cool Item",
+                      description: "It is a very cool item",
+                      unit_price: 100.99,
+                      merchant_id: 14
+                    })
+      headers = {"CONTENT_TYPE" => "application/json"}
+      post "/api/v1/items", headers: headers, params: JSON.generate(item: item_params)
+
+      created_item = Item.last
+
+      expect(response).to be_successful 
+      expect(created_item.name).to eq(item_params[:name])
+      expect(created_item.description).to eq(item_params[:description])
+      expect(created_item.unit_price).to eq(item_params[:unit_price])
+      expect(created_item.merchant_id).to eq(item_params[:merchant_id])
+    end
+
+    it "will not create an item if a parameter isn't given" do 
+      create(:merchant, id: 14)
+      item_params = ({
+                      name: "Very Cool Item",
+                      unit_price: 100.99,
+                      merchant_id: 14
+                    })
+      headers = {"CONTENT_TYPE" => "application/json"}
+      
+      expect{ post "/api/v1/items", headers: headers, params: JSON.generate(item: item_params)}.to raise_error(ActiveRecord::RecordInvalid)
+    end
+  end
 end
