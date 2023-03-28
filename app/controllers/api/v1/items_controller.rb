@@ -1,21 +1,21 @@
 class Api::V1::ItemsController < ApplicationController 
   def index 
-    render json: Api::V1::ItemSerializer.new(Item.all)
+    render json: V1::ItemSerializer.new(Item.all)
   end
 
   def show 
-    render json: Api::V1::ItemSerializer.new(Item.find(params[:id]))
+    render json: V1::ItemSerializer.new(Item.find(params[:id]))
   end
 
   def create 
     merchant = Merchant.find(params["item"]["merchant_id"])
-    render json: Api::V1::ItemSerializer.new(merchant.items.create!(item_params)), status: :created
+    render json: V1::ItemSerializer.new(merchant.items.create!(item_params)), status: :created
   end
 
   def update 
     item = Item.find(params[:id])
     if item.update!(item_params)
-      render json: Api::V1::ItemSerializer.new(item), status: 201
+      render json: V1::ItemSerializer.new(item), status: 201
     else 
       render json: {errors: "Item was not updated"}, status: 404 #why not working in postman? :'( (1b. items update one item)
     end
