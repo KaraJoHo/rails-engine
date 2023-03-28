@@ -88,15 +88,17 @@ RSpec.describe "Items Request Spec" do
                       merchant_id: 14
                     })
       headers = {"CONTENT_TYPE" => "application/json"}
+
+      post "/api/v1/items", headers: headers, params: JSON.generate(item: item_params)
+      expect(response.status).to eq(404)
       
-      expect{ post "/api/v1/items", headers: headers, params: JSON.generate(item: item_params)}.to raise_error(ActiveRecord::RecordInvalid)
     end
   end
 
   describe "update an item" do 
     it "can update an existing item" do 
       create(:merchant, id: 14)
-      id = create(:item).id 
+      id = create(:item, merchant_id: 14).id 
       previous_name = Item.last.name 
       item_params = {name: "Totally New Name"}
       headers = {"CONTENT_TYPE" => "application/json"}
@@ -110,7 +112,15 @@ RSpec.describe "Items Request Spec" do
 
     end
 
-    xit "sad path" do#add sad path
+    it "sad path" do#add sad path
+      create(:merchant, id: 14)
+      id = create(:item, merchant_id: 14).id 
+      previous_merchant_id = Item.last.merchant_id
+      item_params = {merchant_id: 999999999}
+      headers = {"CONTENT_TYPE" => "application/json"}
+
+      patch "/api/v1/items/#{id}", headers: headers, params: JSON.generate({item: item_params})
+      expect(response.status).to eq(404)
     end
 
   end
