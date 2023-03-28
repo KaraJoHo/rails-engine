@@ -92,4 +92,47 @@ RSpec.describe "Items Request Spec" do
       expect{ post "/api/v1/items", headers: headers, params: JSON.generate(item: item_params)}.to raise_error(ActiveRecord::RecordInvalid)
     end
   end
+
+  describe "update an item" do 
+    it "can update an existing item" do 
+      create(:merchant, id: 14)
+      id = create(:item).id 
+      previous_name = Item.last.name 
+      item_params = {name: "Totally New Name"}
+      headers = {"CONTENT_TYPE" => "application/json"}
+
+      patch "/api/v1/items/#{id}", headers: headers, params: JSON.generate({item: item_params})
+      item = Item.find_by(id: id)
+
+      expect(response).to be_successful 
+      expect(item.name).to eq("Totally New Name")
+      expect(item.name).to_not eq(previous_name)
+
+    end
+
+    xit "sad path" do#add sad path
+    end
+
+  end
+
+  describe "delete an item" do 
+    it "can delete an item" do 
+      merchant = create(:merchant)
+      item = create(:item, merchant_id: merchant.id)
+
+      expect(Item.count).to eq(1)
+
+      delete "/api/v1/items/#{item.id}"
+
+      expect(response).to be_successful 
+      expect(Item.count).to eq(0)
+      expect{Item.find(item.id)}.to raise_error(ActiveRecord::RecordNotFound)
+    end
+
+    it "doesn't delete a record that doesn't exist" do 
+      merchant = create(:merchant)
+      item = create(:item, merchant_id: merchant.id)
+      expect{delete "/api/v1/items/1111111"}.to raise_error(ActiveRecord::RecordNotFound)
+    end
+  end
 end
