@@ -17,7 +17,7 @@ class Api::V1::ItemsController < ApplicationController
     if item.update!(item_params)
       render json: V1::ItemSerializer.new(item), status: 201
     else 
-      render json: {errors: "Item was not updated"}, status: 404 #why not working in postman? :'( (1b. items update one item)
+      render json: "", status: 404 
     end
   end
 
