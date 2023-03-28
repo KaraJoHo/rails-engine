@@ -1,4 +1,4 @@
-class Api::V1::MerchantSerializer 
+class V1::MerchantSerializer 
   include JSONAPI::Serializer
   attributes :name
   # def self.format_merchants(merchants) 
