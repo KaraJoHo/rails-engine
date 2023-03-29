@@ -54,8 +54,15 @@ RSpec.describe "Items Request Spec" do
 
     it "returns an error when an item that doesn't exist is requested" do 
       create(:item)
+      get "/api/v1/items/not_even_a_number"
 
-      expect {get "/api/v1/items/not_even_a_number"}.to raise_error(ActiveRecord::RecordNotFound)
+      item_not_existing = JSON.parse(response.body, symbolize_names: true)
+
+      expect(response.status).to eq(404)
+      expect(item_not_existing).to have_key(:error)
+      expect(item_not_existing).to have_key(:message)
+      expect(item_not_existing[:error]).to eq("Couldn't find Item with 'id'=not_even_a_number")
+      expect(item_not_existing[:message]).to eq("your query could not be completed")
     end
   end
 
@@ -90,8 +97,17 @@ RSpec.describe "Items Request Spec" do
       headers = {"CONTENT_TYPE" => "application/json"}
 
       post "/api/v1/items", headers: headers, params: JSON.generate(item: item_params)
-      expect(response.status).to eq(404)
-      
+
+      cannot_create = JSON.parse(response.body, symbolize_names: true)
+
+      expect(cannot_create).to have_key(:errors)
+      expect(cannot_create).to have_key(:message)
+      expect(cannot_create).to have_key(:data)
+      expect(cannot_create[:data][:id]).to eq(nil)
+      expect(cannot_create[:data][:attributes]).to eq({})
+      expect(cannot_create[:errors][0]).to have_key(:description)
+      expect(cannot_create[:errors][0][:description]).to eq(["can't be blank"])
+      expect(response.status).to eq(404)  
     end
   end
 
@@ -112,7 +128,7 @@ RSpec.describe "Items Request Spec" do
 
     end
 
-    it "sad path" do#add sad path
+    it "does not update for merchant that doesnt exist" do
       create(:merchant, id: 14)
       id = create(:item, merchant_id: 14).id 
       previous_merchant_id = Item.last.merchant_id
@@ -120,9 +136,18 @@ RSpec.describe "Items Request Spec" do
       headers = {"CONTENT_TYPE" => "application/json"}
 
       patch "/api/v1/items/#{id}", headers: headers, params: JSON.generate({item: item_params})
+
+      cannot_update = JSON.parse(response.body, symbolize_names: true)
+
+      expect(cannot_update).to have_key(:errors)
+      expect(cannot_update).to have_key(:message)
+      expect(cannot_update).to have_key(:data)
+      expect(cannot_update[:data][:id]).to eq(nil)
+      expect(cannot_update[:data][:attributes]).to eq({})
+      expect(cannot_update[:errors][0]).to have_key(:merchant)
+      expect(cannot_update[:errors][0][:merchant]).to eq(["must exist"])
       expect(response.status).to eq(404)
     end
-
   end
 
   describe "delete an item" do 
@@ -142,7 +167,16 @@ RSpec.describe "Items Request Spec" do
     it "doesn't delete a record that doesn't exist" do 
       merchant = create(:merchant)
       item = create(:item, merchant_id: merchant.id)
-      expect{delete "/api/v1/items/1111111"}.to raise_error(ActiveRecord::RecordNotFound)
+      
+      delete "/api/v1/items/1111111" 
+
+      item_not_existing = JSON.parse(response.body, symbolize_names: true)
+
+      expect(response.status).to eq(404)
+      expect(item_not_existing).to have_key(:error)
+      expect(item_not_existing).to have_key(:message)
+      expect(item_not_existing[:error]).to eq("Couldn't find Item with 'id'=1111111")
+      expect(item_not_existing[:message]).to eq("your query could not be completed")
     end
   end
 end
