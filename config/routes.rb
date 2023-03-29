@@ -13,6 +13,9 @@ Rails.application.routes.draw do
       end
 
       resources :items do 
+        collection do 
+          get "find_all", to: "items/search#search_name"
+        end
         resources :merchant, only: [:index], controller: 'items/merchants'
       end
     end
