@@ -30,7 +30,14 @@ RSpec.describe "Merchant Items Requests" do
     it "returns an error when an incorrect merchant id is given" do 
       merchant = merchant_with_items 
 
-      expect {get "/api/v1/merchants/9999/items"}.to raise_error(ActiveRecord::RecordNotFound)
+      get "/api/v1/merchants/9999/items"
+
+      incorrect_id = JSON.parse(response.body, symbolize_names: true)
+
+      expect(incorrect_id).to have_key(:error)
+      expect(incorrect_id).to have_key(:message)
+      expect(incorrect_id[:error]).to eq("Couldn't find Merchant with 'id'=9999")
+      expect(incorrect_id[:message]).to eq("your query could not be completed")
     end
   end
 end

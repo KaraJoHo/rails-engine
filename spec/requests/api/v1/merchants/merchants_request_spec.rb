@@ -52,7 +52,14 @@ RSpec.describe "Merchant API" do
     it "sad path - is not succuessful with an incorrect id" do 
       create_list(:merchant, 3)
     
-      expect {get "/api/v1/merchants/9999"}.to raise_error(ActiveRecord::RecordNotFound)
+      get "/api/v1/merchants/9999"
+
+      incorrect_id = JSON.parse(response.body, symbolize_names: true)
+
+      expect(incorrect_id).to have_key(:error)
+      expect(incorrect_id).to have_key(:message)
+      expect(incorrect_id[:error]).to eq("Couldn't find Merchant with 'id'=9999")
+      expect(incorrect_id[:message]).to eq("your query could not be completed")
     end
   end
 end

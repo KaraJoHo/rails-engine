@@ -69,7 +69,7 @@ RSpec.describe "Find All Items Request" do
 
       found_items = JSON.parse(response.body, symbolize_names: true)
      
-      expect(found_items[:errors]).to eq("Can't be less than zero")
+      expect(found_items[:errors]).to eq(["Can't be less than zero"])
     end
 
     it "can return all items equal to or less than the given max price" do
