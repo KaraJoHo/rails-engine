@@ -178,5 +178,31 @@ RSpec.describe "Items Request Spec" do
       expect(item_not_existing[:error]).to eq("Couldn't find Item with 'id'=1111111")
       expect(item_not_existing[:message]).to eq("your query could not be completed")
     end
+
+    it "deletes invoices from the item that was deleted" do 
+      merchant = create(:merchant)
+      customer = create(:customer)
+
+      item_1 = create(:item, merchant_id: merchant.id)
+
+      invoice_1 = create(:invoice, merchant_id: merchant.id, customer_id: customer.id)
+      invoice_2 = create(:invoice, merchant_id: merchant.id, customer_id: customer.id)
+      invoice_3 = create(:invoice, merchant_id: merchant.id, customer_id: customer.id)
+
+      ii_1 = create(:invoice_item, invoice_id: invoice_2.id, item_id: item_1.id)
+      ii_2 = create(:invoice_item, invoice_id: invoice_3.id, item_id: item_1.id)
+
+      delete "/api/v1/items/#{item_1.id}"
+     
+      expect(Invoice.all.count).to eq(1)
+      expect(Item.all.count).to eq(0)
+
+      expect(Invoice.exists?(invoice_2.id)).to be(false)
+      expect(Invoice.exists?(invoice_3.id)).to be(false)
+      expect(Invoice.exists?(invoice_1.id)).to be(true)
+
+      expect(Item.exists?(item_1.id)).to be(false)
+      expect(Invoice.find(invoice_1.id)).to eq(invoice_1)
+    end
   end
 end
