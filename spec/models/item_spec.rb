@@ -11,4 +11,62 @@ RSpec.describe Item do
     it {should belong_to :merchant}
     # it {should have_many :invoice_items}
   end
+
+  describe "find_bys" do 
+    it "finds a list of items by a name search" do 
+      merchant = create(:merchant)
+
+      item_1 = create(:item, merchant_id: merchant.id, name: "Cat Food")
+      item_2 = create(:item, merchant_id: merchant.id, name: "Treats for cats")
+      item_3 = create(:item, merchant_id: merchant.id, name: "Dog Food")
+
+      expect(Item.find_by_name_search("cat")).to eq([item_1, item_2])
+      expect(Item.find_by_name_search("cAt")).to eq([item_1, item_2])
+      expect(Item.find_by_name_search("CA")).to eq([item_1, item_2])
+      expect(Item.find_by_name_search("cAtS")).to eq([item_2])
+      expect(Item.find_by_name_search("aT")).to eq([item_1, item_2])
+      expect(Item.find_by_name_search("food")).to eq([item_1, item_3])
+    end
+
+    it "finds items by name sorted alphabetically" do 
+      merchant = create(:merchant)
+
+      item_1 = create(:item, merchant_id: merchant.id, name: "Timothy's Cat Food")
+      item_2 = create(:item, merchant_id: merchant.id, name: "Ariel's Cat Food")
+      item_3 = create(:item, merchant_id: merchant.id, name: "Dog Food")
+
+      expect(Item.find_by_name_search("cat")).to eq([item_2, item_1])
+      expect(Item.find_by_name_search("cat")).to_not eq([item_1, item_2])
+    end
+
+    it "finds a list of items by a min_price search, ordered alphabetically by name" do 
+      merchant = create(:merchant)
+
+      item_1 = create(:item, name: "B", merchant_id: merchant.id, unit_price: 10.00)
+      item_2 = create(:item, merchant_id: merchant.id, unit_price: 2.00)
+      item_3 = create(:item, name: "A", merchant_id: merchant.id, unit_price: 5.00)
+
+      expect(Item.find_by_min_price("5.00")).to eq([item_3, item_1])
+    end
+
+    it "finds a list of items by a max_price search, ordered alphabetically" do 
+      merchant = create(:merchant)
+
+      item_1 = create(:item, name: "B", merchant_id: merchant.id, unit_price: 10.00)
+      item_2 = create(:item, name: "C", merchant_id: merchant.id, unit_price: 2.00)
+      item_3 = create(:item, name: "A", merchant_id: merchant.id, unit_price: 5.00)
+
+      expect(Item.find_by_max_price("9.00")).to eq([item_3, item_2])
+    end
+
+    it "finds the price between the max and min given" do 
+      merchant = create(:merchant)
+
+      item_1 = create(:item, name: "B", merchant_id: merchant.id, unit_price: 10.00)
+      item_2 = create(:item, name: "C", merchant_id: merchant.id, unit_price: 2.00)
+      item_3 = create(:item, name: "A", merchant_id: merchant.id, unit_price: 5.00)
+
+      expect(Item.find_by_price_between("9.00", "1.00")).to eq([item_3, item_2])
+    end
+  end
 end

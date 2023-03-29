@@ -21,5 +21,15 @@ RSpec.describe Merchant do
       expect(Merchant.find_by_name_query("za")).to eq(merchant_1)
       expect(Merchant.find_by_name_query("Awesesom")).to_not eq(merchant_2)
     end
+
+    it "returns the first name in alphabetical order if more than one result is found" do 
+      merchant_1 = create(:merchant, name: "Awesome Pizza")
+      merchant_2 = create(:merchant, name: "Vintage Mirrors")
+      merchant_3 = create(:merchant, name: "Turing")
+      merchant_4 = create(:merchant, name: "Ring World")
+      
+
+      expect(Merchant.find_by_name_query("ring")).to eq(merchant_4)
+    end
   end
 end
