@@ -7,7 +7,7 @@ RSpec.describe Merchant do
 
   describe "relationships" do 
     it {should have_many :items}
-    # it {should have_many :invoices}
+    it {should have_many :invoices}
   end
 
   describe "find_by_name_query" do 
