@@ -24,6 +24,7 @@ RSpec.describe "Find Merchant Request" do
       get "/api/v1/merchants/find?name=cat"
 
       no_data = JSON.parse(response.body, symbolize_names: true)
+      
       expect(no_data).to be_a(Hash)
       expect(no_data[:data].count).to eq(0)
     end
