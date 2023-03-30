@@ -27,6 +27,16 @@ RSpec.describe "Items Request Spec" do
         expect(item[:attributes][:merchant_id].to_i).to be_an(Integer)
       end
     end
+
+    it "returns an array of data when zero records are found" do 
+      get "/api/v1/items"
+
+      expect(response).to be_successful 
+
+      items = JSON.parse(response.body, symbolize_names: true)
+
+      expect(items[:data].count).to eq(0)
+    end
   end
 
   describe "get one item" do 
@@ -108,6 +118,24 @@ RSpec.describe "Items Request Spec" do
       expect(cannot_create[:errors][0]).to have_key(:description)
       expect(cannot_create[:errors][0][:description]).to eq(["can't be blank"])
       expect(response.status).to eq(404)  
+    end
+
+    it "will ignore attributes sent by user that are now allowed" do 
+      create(:merchant, id: 14)
+      item_params = ({
+                      name: "Very Cool Item",
+                      description: "Wow an item that is cool",
+                      unit_price: 100.99,
+                      merchant_id: 14,
+                      nope_not_this: "I am not an attribute that is allowed"
+                    })
+      headers = {"CONTENT_TYPE" => "application/json"}
+
+      post "/api/v1/items", headers: headers, params: JSON.generate(item: item_params)
+
+      item = JSON.parse(response.body, symbolize_names: true)
+      
+      expect(item[:data][:attributes]).to_not have_key(:nope_not_this)
     end
   end
 
