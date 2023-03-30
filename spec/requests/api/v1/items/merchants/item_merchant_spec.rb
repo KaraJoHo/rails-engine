@@ -20,8 +20,6 @@ RSpec.describe "Item's Merchant Request" do
       merchant = create(:merchant)
       item = create(:item, merchant_id: merchant.id)
 
-      # expect{get "/api/v1/items/500000000/merchant"}.to raise_error(ActiveRecord::RecordNotFound)
-
       get "/api/v1/items/500000000/merchant" 
 
       bad_id_response = JSON.parse(response.body, symbolize_names: true)

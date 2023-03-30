@@ -36,13 +36,16 @@ RSpec.describe "Find All Items Request" do
     end
   end
 
+  before(:each) do 
+    @merchant = create(:merchant)
+
+    @item_1 = create(:item, name: "B", merchant_id: @merchant.id, unit_price: 10.00)
+    @item_2 = create(:item, name: "C", merchant_id: @merchant.id, unit_price: 2.00)
+    @item_3 = create(:item, name: "A", merchant_id: @merchant.id, unit_price: 5.00)
+  end
+
   describe "find all items by a price query search" do 
     it "find all items equal to or greater than the searched min price" do 
-      merchant = create(:merchant)
-
-      item_1 = create(:item, name: "B", merchant_id: merchant.id, unit_price: 10.00)
-      item_2 = create(:item, merchant_id: merchant.id, unit_price: 2.00)
-      item_3 = create(:item, name: "A", merchant_id: merchant.id, unit_price: 5.00)
 
       get "/api/v1/items/find_all?min_price=5"
 
@@ -51,17 +54,12 @@ RSpec.describe "Find All Items Request" do
       found_items = JSON.parse(response.body, symbolize_names: true)
      
       expect(found_items[:data].count).to eq(2)
-      expect(found_items[:data].first[:id].to_i).to eq(item_3.id)
-      expect(found_items[:data].last[:id].to_i).to eq(item_1.id)
+      expect(found_items[:data].first[:id].to_i).to eq(@item_3.id)
+      expect(found_items[:data].last[:id].to_i).to eq(@item_1.id)
 
     end
 
     it "cannot search for something under 0" do 
-      merchant = create(:merchant)
-
-      item_1 = create(:item, name: "B", merchant_id: merchant.id, unit_price: 10.00)
-      item_2 = create(:item, merchant_id: merchant.id, unit_price: 2.00)
-      item_3 = create(:item, name: "A", merchant_id: merchant.id, unit_price: 5.00)
 
       get "/api/v1/items/find_all?min_price=-1"
 
@@ -73,11 +71,6 @@ RSpec.describe "Find All Items Request" do
     end
 
     it "can return all items equal to or less than the given max price" do
-      merchant = create(:merchant)
-
-      item_1 = create(:item, name: "B", merchant_id: merchant.id, unit_price: 10.00)
-      item_2 = create(:item, name: "C", merchant_id: merchant.id, unit_price: 2.00)
-      item_3 = create(:item, name: "A", merchant_id: merchant.id, unit_price: 5.00)
 
       get "/api/v1/items/find_all?max_price=9"
 
@@ -86,17 +79,12 @@ RSpec.describe "Find All Items Request" do
       found_items = JSON.parse(response.body, symbolize_names: true)
      
       expect(found_items[:data].count).to eq(2)
-      expect(found_items[:data].first[:id].to_i).to eq(item_3.id)
-      expect(found_items[:data].last[:id].to_i).to eq(item_2.id)
+      expect(found_items[:data].first[:id].to_i).to eq(@item_3.id)
+      expect(found_items[:data].last[:id].to_i).to eq(@item_2.id)
 
     end 
 
     it "returns items between the min and max price given" do 
-      merchant = create(:merchant)
-
-      item_1 = create(:item, name: "B", merchant_id: merchant.id, unit_price: 10.00)
-      item_2 = create(:item, name: "C", merchant_id: merchant.id, unit_price: 2.00)
-      item_3 = create(:item, name: "A", merchant_id: merchant.id, unit_price: 5.00)
 
       get "/api/v1/items/find_all?max_price=9&min_price=1"
 
@@ -105,17 +93,12 @@ RSpec.describe "Find All Items Request" do
       found_items = JSON.parse(response.body, symbolize_names: true)
      
       expect(found_items[:data].count).to eq(2)
-      expect(found_items[:data].first[:id].to_i).to eq(item_3.id)
-      expect(found_items[:data].last[:id].to_i).to eq(item_2.id)
+      expect(found_items[:data].first[:id].to_i).to eq(@item_3.id)
+      expect(found_items[:data].last[:id].to_i).to eq(@item_2.id)
 
     end
 
     it "cannot search for name and price at the same time" do 
-      merchant = create(:merchant)
-
-      item_1 = create(:item, name: "B", merchant_id: merchant.id, unit_price: 10.00)
-      item_2 = create(:item, name: "C", merchant_id: merchant.id, unit_price: 2.00)
-      item_3 = create(:item, name: "A", merchant_id: merchant.id, unit_price: 5.00)
 
       get "/api/v1/items/find_all?max_price=9&name=karen"
 
@@ -128,11 +111,6 @@ RSpec.describe "Find All Items Request" do
     end
 
     it "renders an error if nothing is searched for" do 
-      merchant = create(:merchant)
-
-      item_1 = create(:item, name: "B", merchant_id: merchant.id, unit_price: 10.00)
-      item_2 = create(:item, name: "C", merchant_id: merchant.id, unit_price: 2.00)
-      item_3 = create(:item, name: "A", merchant_id: merchant.id, unit_price: 5.00)
 
       get "/api/v1/items/find_all"
 
@@ -141,6 +119,17 @@ RSpec.describe "Find All Items Request" do
       found_items = JSON.parse(response.body, symbolize_names: true)
      
       expect(found_items[:errors]).to eq("Something went wrong")
+    end
+
+    it "renders an error if the parameter is empty" do 
+
+      get "/api/v1/items/find_all?name="
+
+      expect(response).to_not be_successful
+
+      found_items = JSON.parse(response.body, symbolize_names: true)
+     
+      expect(found_items[:errors]).to eq("Parameter cannot be empty")
     end
   end
 end

@@ -8,12 +8,6 @@ class Item < ApplicationRecord
   validates_presence_of :name, :description, :unit_price
   validates_numericality_of :unit_price
 
-  def delete_invoices_from_item 
-    invoices.only_one_item.each do |invoice| 
-      invoice.destroy!
-    end
-  end
-
   def self.find_by_name_search(name_fragment)
     where("lower(name) ILIKE?", "%#{name_fragment}%").order(:name)
   end
@@ -28,5 +22,11 @@ class Item < ApplicationRecord
 
   def self.find_by_price_between(max, min)
     where('unit_price <= ?', max.to_f).where('unit_price >= ?', min.to_f).order(:name)
+  end
+
+  def delete_invoices_from_item 
+    invoices.only_one_item.each do |invoice| 
+      invoice.destroy!
+    end
   end
 end
