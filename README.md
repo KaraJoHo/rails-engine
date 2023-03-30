@@ -1,25 +1,15 @@
 # README
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
-
-Things you may want to cover:
-
 * Ruby version
-
-* System dependencies
-
-* Configuration
-
-* Database creation
+  - 3.1.1
+* Rails version 
+  - 7.0.4.3
 
 * Database initialization
+  - `rails db:{drop, create, migrate, seed}`
+  - `rails db:schema:dump`
 
 * How to run the test suite
+  - `bundle exec rspec`
 
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
 # rails-engine
