@@ -112,11 +112,8 @@ RSpec.describe "Items Request Spec" do
 
       expect(cannot_create).to have_key(:errors)
       expect(cannot_create).to have_key(:message)
-      expect(cannot_create).to have_key(:data)
-      expect(cannot_create[:data][:id]).to eq(nil)
-      expect(cannot_create[:data][:attributes]).to eq({})
-      expect(cannot_create[:errors][0]).to have_key(:description)
-      expect(cannot_create[:errors][0][:description]).to eq(["can't be blank"])
+      expect(cannot_create[:errors]).to have_key(:description)
+      expect(cannot_create[:errors][:description]).to eq(["can't be blank"])
       expect(response.status).to eq(404)  
     end
 
@@ -169,11 +166,8 @@ RSpec.describe "Items Request Spec" do
 
       expect(cannot_update).to have_key(:errors)
       expect(cannot_update).to have_key(:message)
-      expect(cannot_update).to have_key(:data)
-      expect(cannot_update[:data][:id]).to eq(nil)
-      expect(cannot_update[:data][:attributes]).to eq({})
-      expect(cannot_update[:errors][0]).to have_key(:merchant)
-      expect(cannot_update[:errors][0][:merchant]).to eq(["must exist"])
+      expect(cannot_update[:errors]).to have_key(:merchant)
+      expect(cannot_update[:errors][:merchant]).to eq(["must exist"])
       expect(response.status).to eq(404)
     end
   end

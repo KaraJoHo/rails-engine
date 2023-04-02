@@ -3,7 +3,7 @@ class ApplicationController < ActionController::API
   rescue_from ActiveRecord::RecordNotFound, with: :render_not_found_response
 
   def render_unprocessable_entity_response(exception)
-    render json: ErrorSerializer.bad_params(exception.record.errors), status: 404
+    render json: ErrorSerializer.new(exception.record.errors).bad_request, status: 404
   end
 
   def render_not_found_response(exception)

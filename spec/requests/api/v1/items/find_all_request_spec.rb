@@ -67,7 +67,7 @@ RSpec.describe "Find All Items Request" do
 
       found_items = JSON.parse(response.body, symbolize_names: true)
      
-      expect(found_items[:errors]).to eq(["Can't be less than zero"])
+      expect(found_items[:errors]).to eq("Can't be less than zero")
     end
 
     it "can return all items equal to or less than the given max price" do
@@ -106,7 +106,7 @@ RSpec.describe "Find All Items Request" do
 
       found_items = JSON.parse(response.body, symbolize_names: true)
      
-      expect(found_items[:data][:error]).to eq("Cannot search with name and price")
+      expect(found_items[:errors]).to eq("Cannot search with name and price")
       expect(response.status).to eq(400)
     end
 
@@ -114,7 +114,7 @@ RSpec.describe "Find All Items Request" do
 
       get "/api/v1/items/find_all"
 
-      expect(response).to be_successful
+      expect(response).to_not be_successful
 
       found_items = JSON.parse(response.body, symbolize_names: true)
      
