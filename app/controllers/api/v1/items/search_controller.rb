@@ -3,7 +3,7 @@ class Api::V1::Items::SearchController < ApplicationController
     if params[:name] && (params[:min_price] || params[:max_price])
       render json: ErrorSerializer.new("Cannot search with name and price").bad_request, status: 400
     elsif params[:name] == "" 
-      render json: {errors: "Parameter cannot be empty"}, status: 400
+      render json: ErrorSerializer.new("Parameter cannot be empty").bad_request, status: 400
     elsif params[:name]
       render json: V1::ItemSerializer.new(Item.find_by_name_search(params[:name]))
     elsif params[:min_price].to_f < 0 || params[:max_price].to_f < 0
