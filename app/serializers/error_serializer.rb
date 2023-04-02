@@ -9,7 +9,6 @@ class ErrorSerializer
       errors: @errors
     }
   end
-
   # def self.response_for_400
   #   {
   #     message: "your query could not be completed",
